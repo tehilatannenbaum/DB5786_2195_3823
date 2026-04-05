@@ -12,6 +12,8 @@ The goal is to provide an intuitive and modern interface for managing restaurant
 
 ## 🖥️ UI Screens (Google AI Studio)
 
+https://ai.studio/apps/3cb0f4c9-3878-4d29-a612-cc7284a6e892
+
 ### 🔹 Screen 1 – Dashboard
 ![Dashboard](images/Dashboard.png)
 
