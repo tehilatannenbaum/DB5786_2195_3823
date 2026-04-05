@@ -50,5 +50,23 @@ It is designed to improve efficiency in daily operations, enhance user experienc
 
 ---
 
-## 🗂️ ERD Diagram
-*(Add your ERDPlus screenshot here)*
+## 🗄️ ER Diagram
+
+![ER Diagram](images/ERD.png)
+
+The system is based on several main entities:
+
+- Customer – stores customer details (id, name, phone)  
+- Reservation – stores reservation details (date, time, number of guests)  
+- RestaurantTable – represents tables in the restaurant (capacity, status)  
+- Order – represents orders made in the restaurant  
+- OrderItem – connects between orders and menu items  
+- MenuItem – represents dishes in the menu (name, category, price, availability)  
+
+### Relationships:
+
+- A Customer makes Reservations (one customer can have multiple reservations)  
+- Each Reservation is assigned to one Table  
+- A Table can have multiple Orders  
+- An Order contains multiple OrderItems  
+- Each OrderItem is linked to one MenuItem  
