@@ -71,4 +71,34 @@ The system is based on several main entities:
 - Each Reservation is assigned to one Table  
 - A Table can have multiple Orders  
 - An Order contains multiple OrderItems  
-- Each OrderItem is linked to one MenuItem  
+- Each OrderItem is linked to one MenuItem
+
+## 🗂️ Database Schema Diagram (DSD)
+
+![DSD](images/DSD.png)
+
+The Database Schema Diagram (DSD) represents the relational structure of the restaurant module after converting the ERD into database tables.
+
+It shows the primary keys and foreign keys used to connect the entities in the system and reflects how the data will actually be stored in the database.
+
+### Main Tables in the DSD:
+
+- **Customer** – stores customer information such as `customer_id`, `name`, and `phone`
+- **Reservation** – stores reservation details such as `reservation_id`, `date`, `time`, `number_of_guests`, and links to the customer and table
+- **RestaurantTable** – stores restaurant table details such as `table_id`, `capacity`, and `status`
+- **Orders** – stores order information such as `order_id`, `order_time`, `status`, `total_price`, and the related table
+- **OrderItem** – a junction table that connects orders with menu items and stores the quantity of each item in the order
+- **MenuItem** – stores menu dish information such as `item_id`, `name`, `category`, `price`, and `availability`
+
+### Foreign Key Relationships:
+
+- `Reservation.customer_id` → `Customer.customer_id`
+- `Reservation.table_id` → `RestaurantTable.table_id`
+- `Orders.table_id` → `RestaurantTable.table_id`
+- `OrderItem.order_id` → `Orders.order_id`
+- `OrderItem.item_id` → `MenuItem.item_id`
+
+### Purpose of the DSD:
+
+The DSD helps translate the conceptual ERD design into an actual relational database structure.  
+It ensures that the tables are properly connected, reduces redundancy, and supports efficient data storage and retrieval.
