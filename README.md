@@ -102,3 +102,143 @@ It shows the primary keys and foreign keys used to connect the entities in the s
 
 The DSD helps translate the conceptual ERD design into an actual relational database structure.  
 It ensures that the tables are properly connected, reduces redundancy, and supports efficient data storage and retrieval.
+
+# Data Dictionary
+
+This data dictionary describes the database tables of the restaurant management system.  
+It includes the purpose of each table, its attributes, primary keys, foreign keys, and constraints.
+
+---
+
+## Customer
+**Purpose:** Stores information about restaurant customers.
+
+| Field | Type | Description |
+|------|------|------------|
+| customer_id | INT | Unique identifier for each customer |
+| name | VARCHAR(100) | Customer full name |
+| phone | VARCHAR(20) | Customer phone number |
+
+**Primary Key:**  
+- customer_id  
+
+**Constraints:**  
+- All fields are NOT NULL  
+- phone is UNIQUE  
+
+---
+
+## RestaurantTable
+**Purpose:** Stores information about restaurant tables.
+
+| Field | Type | Description |
+|------|------|------------|
+| table_id | INT | Unique identifier for each table |
+| capacity | INT | Number of seats at the table |
+| status | VARCHAR(20) | Current table status |
+
+**Primary Key:**  
+- table_id  
+
+**Constraints:**  
+- capacity > 0  
+- status IN ('available', 'reserved', 'occupied')  
+
+---
+
+## Reservation
+**Purpose:** Stores reservations made by customers.
+
+| Field | Type | Description |
+|------|------|------------|
+| reservation_id | INT | Unique identifier for each reservation |
+| date | DATE | Reservation date |
+| time | TIME | Reservation time |
+| number_of_guests | INT | Number of guests |
+| customer_id | INT | Related customer |
+| table_id | INT | Assigned table |
+
+**Primary Key:**  
+- reservation_id  
+
+**Foreign Keys:**  
+- customer_id → Customer(customer_id)  
+- table_id → RestaurantTable(table_id)  
+
+**Constraints:**  
+- number_of_guests > 0  
+- All fields are NOT NULL  
+
+---
+
+## Orders
+**Purpose:** Stores food orders in the restaurant.
+
+| Field | Type | Description |
+|------|------|------------|
+| order_id | INT | Unique identifier for each order |
+| order_time | TIME | Time of the order |
+| status | VARCHAR(20) | Order status |
+| total_price | DECIMAL(10,2) | Total order price |
+| table_id | INT | Table that placed the order |
+
+**Primary Key:**  
+- order_id  
+
+**Foreign Keys:**  
+- table_id → RestaurantTable(table_id)  
+
+**Constraints:**  
+- total_price >= 0  
+- status IN ('pending', 'preparing', 'served', 'cancelled')  
+- All fields are NOT NULL  
+
+---
+
+## MenuItem
+**Purpose:** Stores menu items offered by the restaurant.
+
+| Field | Type | Description |
+|------|------|------------|
+| item_id | INT | Unique identifier for each item |
+| name | VARCHAR(100) | Item name |
+| category | VARCHAR(50) | Item category |
+| price | DECIMAL(10,2) | Item price |
+| availability | BOOLEAN | Availability status |
+
+**Primary Key:**  
+- item_id  
+
+**Constraints:**  
+- price >= 0  
+- All fields are NOT NULL  
+
+---
+
+## OrderItem
+**Purpose:** Links orders with menu items and stores quantities.
+
+| Field | Type | Description |
+|------|------|------------|
+| order_item_id | INT | Unique identifier |
+| quantity | INT | Quantity ordered |
+| order_id | INT | Related order |
+| item_id | INT | Related menu item |
+
+**Primary Key:**  
+- order_item_id  
+
+**Foreign Keys:**  
+- order_id → Orders(order_id)  
+- item_id → MenuItem(item_id)  
+
+**Constraints:**  
+- quantity > 0  
+- All fields are NOT NULL  
+
+---
+
+## Summary
+The database is designed in Third Normal Form (3NF).  
+Each table represents a single entity, and all attributes depend only on the primary key.  
+Constraints are used to ensure data integrity and prevent invalid data entry.
