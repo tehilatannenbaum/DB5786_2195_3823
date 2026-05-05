@@ -242,3 +242,10 @@ It includes the purpose of each table, its attributes, primary keys, foreign key
 The database is designed in Third Normal Form (3NF).  
 Each table represents a single entity, and all attributes depend only on the primary key.  
 Constraints are used to ensure data integrity and prevent invalid data entry.
+
+
+
+### dropTables.sql
+
+This file contains DROP TABLE commands for deleting all database tables in an order that respects the foreign key dependencies between them.  
+The dependent tables are dropped first, allowing the script to run smoothly without constraint errors.
