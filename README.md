@@ -249,3 +249,19 @@ Constraints are used to ensure data integrity and prevent invalid data entry.
 
 This file contains DROP TABLE commands for deleting all database tables in an order that respects the foreign key dependencies between them.  
 The dependent tables are dropped first, allowing the script to run smoothly without constraint errors.
+
+Backup Process:
+
+We created a backup of the database using two different methods:
+
+1. Command line:
+We used the pg_dump command through Docker:
+docker exec db_postgres pg_dump -U admin -d restaurant > backup_01_05_26.sql
+
+2. pgAdmin UI:
+We used the Backup option from pgAdmin.
+
+To verify the backup, we restored it into a new database named "restaurant_backup" using:
+Get-Content backup_01_05_26.sql | docker exec -i db_postgres psql -U admin -d restaurant_backup
+
+We confirmed that the restore was successful by checking that all tables and data were correctly loaded.
