@@ -43,7 +43,7 @@ CREATE TABLE MenuItem (
     item_id INT NOT NULL,
     name VARCHAR(100) NOT NULL,
     category VARCHAR(50) NOT NULL,
-    price DECIMAL(10,2) NOT NULL CHECK (price >= 0),
+    price DECIMAL(10,2) NOT NULL CHECK (price > 0),
     availability BOOLEAN NOT NULL,
     PRIMARY KEY (item_id)
 );
