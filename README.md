@@ -268,6 +268,7 @@ Get-Content backup_01_05_26.sql | docker exec -i db_postgres psql -U admin -d re
 We confirmed that the restore was successful by checking that all tables and data were correctly loaded.
 
 ### STAGE 2:
+
 # הסבר על השאילתות
 
 ## Query 1A – לקוחות עם מספר ההזמנות הגבוה ביותר (JOIN)
@@ -282,6 +283,22 @@ We confirmed that the restore was successful by checking that all tables and dat
 - מספר הסועדים הכולל
 
 השאילתה משתמשת ב־JOIN בין הטבלאות Customer ו־Reservation ולאחר מכן מבצעת GROUP BY ו־COUNT לצורך חישוב מספר ההזמנות לכל לקוח.
+
+### קוד השאילתה
+
+```sql
+SELECT
+    c.customer_id,
+    c.name AS customer_name,
+    c.phone,
+    COUNT(r.reservation_id) AS total_reservations,
+    SUM(r.number_of_guests) AS total_guests
+FROM Customer c
+JOIN Reservation r
+ON c.customer_id = r.customer_id
+GROUP BY c.customer_id, c.name, c.phone
+ORDER BY total_reservations DESC;
+```
 
 ---
 
@@ -302,6 +319,28 @@ We confirmed that the restore was successful by checking that all tables and dat
 
 Subquery עלולה להיות פחות יעילה כאשר עובדים עם כמויות מידע גדולות.
 
+### קוד השאילתה
+
+```sql
+SELECT
+    c.customer_id,
+    c.name AS customer_name,
+    c.phone,
+    reservation_data.total_reservations,
+    reservation_data.total_guests
+FROM Customer c
+JOIN (
+    SELECT
+        customer_id,
+        COUNT(reservation_id) AS total_reservations,
+        SUM(number_of_guests) AS total_guests
+    FROM Reservation
+    GROUP BY customer_id
+) AS reservation_data
+ON c.customer_id = reservation_data.customer_id
+ORDER BY reservation_data.total_reservations DESC;
+```
+
 ---
 
 ## Query 2A – שולחנות ללא הזמנות (LEFT JOIN)
@@ -315,6 +354,22 @@ Subquery עלולה להיות פחות יעילה כאשר עובדים עם כ
 - מספר הזמנות
 
 השאילתה משתמשת ב־LEFT JOIN בין RestaurantTable ל־Reservation ולאחר מכן מסננת באמצעות HAVING את השולחנות שאין להם הזמנות.
+
+### קוד השאילתה
+
+```sql
+SELECT
+    rt.table_id,
+    rt.capacity,
+    rt.status,
+    COUNT(r.reservation_id) AS reservation_count
+FROM RestaurantTable rt
+LEFT JOIN Reservation r
+ON rt.table_id = r.table_id
+GROUP BY rt.table_id, rt.capacity, rt.status
+HAVING COUNT(r.reservation_id) = 0
+ORDER BY rt.table_id;
+```
 
 ---
 
@@ -336,90 +391,19 @@ Subquery עלולה להיות פחות יעילה כאשר עובדים עם כ
 
 לעומת זאת LEFT JOIN יוצר צירוף מלא של הטבלאות לפני הסינון.
 
----
+### קוד השאילתה
 
-## Query 3 – סטטיסטיקת הזמנות לפי חודש ושנה
-
-מטרת השאילתה היא להציג סטטיסטיקות של הזמנות לפי חודש ושנה.
-
-השאילתה מציגה:
-- שנה
-- חודש
-- מספר הזמנות
-- מספר סועדים כולל
-- ממוצע סועדים להזמנה
-
-השאילתה משתמשת בפונקציות EXTRACT כדי לפרק את שדה התאריך לשנה וחודש ולאחר מכן מבצעת GROUP BY לצורך חישוב הנתונים הסטטיסטיים.
-
-שאילתה זו מתאימה למסך Dashboard או Analytics במערכת.
-
----
-
-## Query 4 – הכנסות לפי קטגוריית מנות
-
-מטרת השאילתה היא לחשב את ההכנסות מכל קטגוריית מנות במסעדה.
-
-השאילתה מציגה:
-- קטגוריית מנה
-- מספר מנות בקטגוריה
-- כמות פריטים שנמכרו
-- הכנסה כוללת
-- מחיר ממוצע
-
-השאילתה משתמשת ב־JOIN בין MenuItem ל־OrderItem ולאחר מכן מבצעת GROUP BY לפי קטגוריה.
-
-שאילתה זו מאפשרת למנהל המסעדה להבין אילו קטגוריות הן הרווחיות ביותר.
-
----
-
-# הסבר על שאילתות UPDATE
-
-## Update 1 – עדכון מנות לא זמינות
-
-מטרת השאילתה היא לעדכן מנות שלא הוזמנו מעולם כלא זמינות (`availability = false`).
-
-השאילתה בודקת אילו מנות אינן מופיעות בטבלת OrderItem ומעדכנת את סטטוס הזמינות שלהן.
-
----
-
-## Update 2 – עדכון סטטוס שולחנות
-
-מטרת השאילתה היא לעדכן את סטטוס השולחנות ל־`reserved` אם קיימת עבורם הזמנה עתידית.
-
-השאילתה משתמשת בתת־שאילתה כדי למצוא שולחנות עם הזמנות עתידיות ולאחר מכן מעדכנת את הסטטוס שלהם.
-
----
-
-## Update 3 – חישוב מחדש של מחיר הזמנה
-
-מטרת השאילתה היא לחשב מחדש את המחיר הכולל של כל הזמנה לפי:
-- כמות המנות
-- מחיר כל מנה
-
-השאילתה משתמשת ב־JOIN בין OrderItem ל־MenuItem ולאחר מכן מבצעת SUM של מחיר המנות כפול הכמות.
-
----
-
-# הסבר על שאילתות DELETE
-
-## Delete 1 – מחיקת הזמנות שבוטלו
-
-מטרת השאילתה היא למחוק הזמנות שבוטלו (`cancelled`) מטבלת Orders.
-
-השאילתה מסירה מידע שאינו רלוונטי יותר למערכת.
-
----
-
-## Delete 2 – מחיקת הזמנות ישנות
-
-מטרת השאילתה היא למחוק הזמנות משנים קודמות.
-
-השאילתה משתמשת בפונקציית EXTRACT על שדה התאריך כדי לבדוק את שנת ההזמנה.
-
----
-
-## Delete 3 – מחיקת מנות לא זמינות
-
-מטרת השאילתה היא למחוק מנות שסומנו כלא זמינות מהתפריט.
-
-השאילתה מסירה מנות שאינן פעילות יותר במערכת.
+```sql
+SELECT
+    rt.table_id,
+    rt.capacity,
+    rt.status,
+    0 AS reservation_count
+FROM RestaurantTable rt
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM Reservation r
+    WHERE r.table_id = rt.table_id
+)
+ORDER BY rt.table_id;
+```
