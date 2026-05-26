@@ -269,22 +269,20 @@ We confirmed that the restore was successful by checking that all tables and dat
 
 ### STAGE 2:
 
-# הסבר על השאילתות
+## Queries.sql – Query Explanations
 
-## Query 1A – לקוחות עם מספר ההזמנות הגבוה ביותר (JOIN)
+This file contains advanced SQL queries for the restaurant database.  
+The SELECT queries are written in pairs, where each pair solves the same task in two different ways in order to compare efficiency and query structure.
 
-מטרת השאילתה היא להציג את הלקוחות שביצעו את מספר ההזמנות הגבוה ביותר במסעדה.
+---
 
-השאילתה מציגה:
-- מזהה לקוח
-- שם לקוח
-- טלפון
-- מספר ההזמנות
-- מספר הסועדים הכולל
+<details>
+<summary>Query 1A + 1B – לקוחות עם מספר ההזמנות הגבוה ביותר</summary>
 
-השאילתה משתמשת ב־JOIN בין הטבלאות Customer ו־Reservation ולאחר מכן מבצעת GROUP BY ו־COUNT לצורך חישוב מספר ההזמנות לכל לקוח.
+מטרת השאילתה היא להציג את הלקוחות שביצעו את מספר ההזמנות הגבוה ביותר במסעדה.  
+השאילתה מציגה את מזהה הלקוח, שם הלקוח, מספר הטלפון, מספר ההזמנות הכולל ומספר הסועדים הכולל.
 
-### קוד השאילתה
+### Query 1A – Using JOIN
 
 ```sql
 SELECT
@@ -300,26 +298,7 @@ GROUP BY c.customer_id, c.name, c.phone
 ORDER BY total_reservations DESC;
 ```
 
----
-
-## Query 1B – לקוחות עם מספר ההזמנות הגבוה ביותר (Subquery)
-
-שאילתה זו מבצעת את אותה פעולה כמו Query 1A, אך משתמשת בתת־שאילתה (Subquery).
-
-תחילה מתבצע חישוב של מספר ההזמנות ומספר הסועדים לכל לקוח בתוך השאילתה הפנימית, ולאחר מכן מתבצע JOIN מול טבלת Customer כדי להציג את פרטי הלקוח.
-
-### הבדל בין שתי הצורות
-
-- Query 1A משתמשת ב־JOIN ישיר.
-- Query 1B משתמשת ב־Subquery פנימית.
-
-### מה יותר יעיל ומדוע
-
-בדרך כלל JOIN ישיר יעיל יותר משום שמנוע בסיס הנתונים מבצע פחות שלבים ופחות יצירת טבלאות זמניות.
-
-Subquery עלולה להיות פחות יעילה כאשר עובדים עם כמויות מידע גדולות.
-
-### קוד השאילתה
+### Query 1B – Using Subquery
 
 ```sql
 SELECT
@@ -341,21 +320,23 @@ ON c.customer_id = reservation_data.customer_id
 ORDER BY reservation_data.total_reservations DESC;
 ```
 
+### Efficiency Explanation
+
+Query 1A uses a direct JOIN, while Query 1B first calculates reservation statistics inside a subquery and then joins the result with Customer.  
+In many cases, the JOIN version is simpler and can be more efficient because the database optimizer can process the join and aggregation directly.  
+The subquery version is clearer when we want to separate the calculation stage from the customer details stage.
+
+</details>
+
 ---
 
-## Query 2A – שולחנות ללא הזמנות (LEFT JOIN)
+<details>
+<summary>Query 2A + 2B – שולחנות ללא הזמנות</summary>
 
-מטרת השאילתה היא למצוא שולחנות במסעדה שאין להם כלל הזמנות.
+מטרת השאילתה היא למצוא שולחנות במסעדה שאין להם הזמנות כלל.  
+השאילתה מציגה את מספר השולחן, הקיבולת, הסטטוס ומספר ההזמנות.
 
-השאילתה מציגה:
-- מספר שולחן
-- קיבולת
-- סטטוס
-- מספר הזמנות
-
-השאילתה משתמשת ב־LEFT JOIN בין RestaurantTable ל־Reservation ולאחר מכן מסננת באמצעות HAVING את השולחנות שאין להם הזמנות.
-
-### קוד השאילתה
+### Query 2A – Using LEFT JOIN
 
 ```sql
 SELECT
@@ -371,27 +352,7 @@ HAVING COUNT(r.reservation_id) = 0
 ORDER BY rt.table_id;
 ```
 
----
-
-## Query 2B – שולחנות ללא הזמנות (NOT EXISTS)
-
-שאילתה זו מבצעת את אותה פעולה כמו Query 2A, אך משתמשת ב־NOT EXISTS במקום LEFT JOIN.
-
-השאילתה בודקת עבור כל שולחן האם קיימת עבורו הזמנה בטבלת Reservation.  
-אם לא קיימת הזמנה, השולחן יוצג בתוצאה.
-
-### הבדל בין שתי הצורות
-
-- Query 2A משתמשת ב־LEFT JOIN + HAVING.
-- Query 2B משתמשת ב־NOT EXISTS.
-
-### מה יותר יעיל ומדוע
-
-במקרים רבים NOT EXISTS יעיל יותר בטבלאות גדולות משום שהמערכת יכולה לעצור את הבדיקה ברגע שנמצאה התאמה.
-
-לעומת זאת LEFT JOIN יוצר צירוף מלא של הטבלאות לפני הסינון.
-
-### קוד השאילתה
+### Query 2B – Using NOT EXISTS
 
 ```sql
 SELECT
@@ -406,4 +367,206 @@ WHERE NOT EXISTS (
     WHERE r.table_id = rt.table_id
 )
 ORDER BY rt.table_id;
+```
+
+### Efficiency Explanation
+
+Query 2A uses LEFT JOIN and then filters tables with no reservations using HAVING.  
+Query 2B uses NOT EXISTS and checks whether a matching reservation exists for each table.  
+For large tables, NOT EXISTS is often more efficient because the database can stop searching as soon as it finds a matching row.
+
+</details>
+
+---
+
+<details>
+<summary>Query 3A + 3B – סטטיסטיקת הזמנות לפי חודש ושנה</summary>
+
+מטרת השאילתה היא להציג סטטיסטיקות של הזמנות לפי חודש ושנה.  
+השאילתה משתמשת בשדה התאריך ומפרקת אותו לשנה וחודש באמצעות EXTRACT.
+
+### Query 3A – Using GROUP BY directly
+
+```sql
+SELECT
+    EXTRACT(YEAR FROM r.date) AS reservation_year,
+    EXTRACT(MONTH FROM r.date) AS reservation_month,
+    COUNT(r.reservation_id) AS total_reservations,
+    SUM(r.number_of_guests) AS total_guests,
+    AVG(r.number_of_guests) AS average_guests
+FROM Reservation r
+GROUP BY
+    EXTRACT(YEAR FROM r.date),
+    EXTRACT(MONTH FROM r.date)
+ORDER BY reservation_year, reservation_month;
+```
+
+### Query 3B – Using Subquery
+
+```sql
+SELECT
+    reservation_data.reservation_year,
+    reservation_data.reservation_month,
+    COUNT(*) AS total_reservations,
+    SUM(reservation_data.number_of_guests) AS total_guests,
+    AVG(reservation_data.number_of_guests) AS average_guests
+FROM (
+    SELECT
+        reservation_id,
+        number_of_guests,
+        EXTRACT(YEAR FROM date) AS reservation_year,
+        EXTRACT(MONTH FROM date) AS reservation_month
+    FROM Reservation
+) AS reservation_data
+GROUP BY
+    reservation_data.reservation_year,
+    reservation_data.reservation_month
+ORDER BY
+    reservation_data.reservation_year,
+    reservation_data.reservation_month;
+```
+
+### Efficiency Explanation
+
+Query 3A performs the date extraction and grouping directly in the main query.  
+Query 3B first extracts the year and month in a subquery, and only then groups the results.  
+Query 3A is usually more direct and efficient, while Query 3B is more readable when the date processing logic becomes more complex.
+
+</details>
+
+---
+
+<details>
+<summary>Query 4A + 4B – הכנסות לפי קטגוריית מנות</summary>
+
+מטרת השאילתה היא לחשב את ההכנסות מכל קטגוריית מנות במסעדה.  
+השאילתה מציגה קטגוריה, מספר מנות, כמות פריטים שנמכרו, הכנסה כוללת ומחיר ממוצע.
+
+### Query 4A – Using JOIN
+
+```sql
+SELECT
+    mi.category,
+    COUNT(DISTINCT mi.item_id) AS number_of_items,
+    SUM(oi.quantity) AS total_items_sold,
+    SUM(oi.quantity * mi.price) AS total_revenue,
+    AVG(mi.price) AS average_price
+FROM MenuItem mi
+JOIN OrderItem oi
+ON mi.item_id = oi.item_id
+GROUP BY mi.category
+ORDER BY total_revenue DESC;
+```
+
+### Query 4B – Using Subquery
+
+```sql
+SELECT
+    category_data.category,
+    COUNT(DISTINCT category_data.item_id) AS number_of_items,
+    SUM(category_data.quantity) AS total_items_sold,
+    SUM(category_data.item_total) AS total_revenue,
+    AVG(category_data.price) AS average_price
+FROM (
+    SELECT
+        mi.item_id,
+        mi.category,
+        mi.price,
+        oi.quantity,
+        (oi.quantity * mi.price) AS item_total
+    FROM MenuItem mi
+    JOIN OrderItem oi
+    ON mi.item_id = oi.item_id
+) AS category_data
+GROUP BY category_data.category
+ORDER BY total_revenue DESC;
+```
+
+### Efficiency Explanation
+
+Query 4A calculates the revenue directly using JOIN and GROUP BY.  
+Query 4B first creates a calculated result in a subquery and then groups it by category.  
+Query 4A is usually more efficient because it avoids an additional intermediate result, while Query 4B can be easier to understand because it separates the item-level calculation from the category summary.
+
+</details>
+
+---
+
+## UPDATE Queries
+
+### Update 1 – עדכון מנות לא זמינות
+
+מטרת השאילתה היא לסמן מנות שלא הוזמנו מעולם כלא זמינות.
+
+```sql
+UPDATE MenuItem
+SET availability = false
+WHERE item_id NOT IN (
+    SELECT DISTINCT item_id
+    FROM OrderItem
+);
+```
+
+### Update 2 – עדכון סטטוס שולחנות
+
+מטרת השאילתה היא לעדכן את סטטוס השולחנות ל־reserved אם קיימת עבורם הזמנה עתידית.
+
+```sql
+UPDATE RestaurantTable
+SET status = 'reserved'
+WHERE table_id IN (
+    SELECT DISTINCT table_id
+    FROM Reservation
+    WHERE date >= CURRENT_DATE
+);
+```
+
+### Update 3 – חישוב מחדש של מחיר הזמנה
+
+מטרת השאילתה היא לחשב מחדש את המחיר הכולל של כל הזמנה לפי כמות הפריטים ומחיר כל מנה.
+
+```sql
+UPDATE Orders
+SET total_price = order_totals.new_total
+FROM (
+    SELECT
+        oi.order_id,
+        SUM(oi.quantity * mi.price) AS new_total
+    FROM OrderItem oi
+    JOIN MenuItem mi
+    ON oi.item_id = mi.item_id
+    GROUP BY oi.order_id
+) AS order_totals
+WHERE Orders.order_id = order_totals.order_id;
+```
+
+---
+
+## DELETE Queries
+
+### Delete 1 – מחיקת הזמנות שבוטלו
+
+מטרת השאילתה היא למחוק הזמנות שהסטטוס שלהן הוא cancelled.
+
+```sql
+DELETE FROM Orders
+WHERE status = 'cancelled';
+```
+
+### Delete 2 – מחיקת הזמנות ישנות
+
+מטרת השאילתה היא למחוק הזמנות משנים קודמות לפי שדה התאריך.
+
+```sql
+DELETE FROM Reservation
+WHERE EXTRACT(YEAR FROM date) < EXTRACT(YEAR FROM CURRENT_DATE);
+```
+
+### Delete 3 – מחיקת מנות לא זמינות
+
+מטרת השאילתה היא למחוק מנות שסומנו כלא זמינות.
+
+```sql
+DELETE FROM MenuItem
+WHERE availability = false;
 ```
