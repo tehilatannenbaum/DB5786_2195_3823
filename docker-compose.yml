@@ -10,7 +10,7 @@ services:
     ports:
       - "${DB_PORT_SECRET}:5432"
     volumes:
-      - ./db_init:/docker-entrypoint-initdb.d # Auto-setup folder
+      - ./db_init:/docker-entrypoint-initdb.d
       - db_data:/var/lib/postgresql/data
 
   pgadmin:
@@ -23,11 +23,10 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - pg_data
+      - pg_data:/var/lib/pgadmin
     depends_on:
       - db
 
 volumes:
   db_data:
   pg_data:
-
