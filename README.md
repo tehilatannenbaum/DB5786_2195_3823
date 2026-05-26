@@ -516,6 +516,19 @@ WHERE item_id NOT IN (
     FROM OrderItem
 );
 ```
+### צילום בסיס הנתונים לפני העדכון
+
+כאן ניתן לראות מנות שלא הופיעו בטבלת ההזמנות, כאשר חלקן עדיין סומנו כזמינות (`true`).
+
+<img width="2874" height="1457" alt="image" src="https://github.com/user-attachments/assets/484de7ed-ef9a-449e-a7b2-ef44635b06f3" />
+### צילום הרצת השאילתה
+
+כאן ניתן לראות את הרצת שאילתת ה־UPDATE והודעת המערכת שמציינת כי 500 רשומות עודכנו בהצלחה.
+<img width="2852" height="1465" alt="image" src="https://github.com/user-attachments/assets/3c6906a8-8183-4b95-b300-8b6c05647ff3" />
+### צילום בסיס הנתונים אחרי העדכון
+
+לאחר הרצת השאילתה ניתן לראות שכל המנות שלא הופיעו בהזמנות עודכנו לערך `false` בשדה `availability`.
+<img width="2862" height="1473" alt="image" src="https://github.com/user-attachments/assets/5262aa21-d05d-4daf-b34d-13995d51ea4d" />
 
 ### Update 2 – עדכון סטטוס שולחנות
 
@@ -530,6 +543,20 @@ WHERE table_id IN (
     WHERE date >= CURRENT_DATE
 );
 ```
+### צילום בסיס הנתונים לפני העדכון
+
+כאן ניתן לראות שולחנות בעלי הזמנות עתידיות לפני שינוי הסטטוס.
+
+<img width="2870" height="1468" alt="image" src="https://github.com/user-attachments/assets/95e59927-719c-40ab-a65c-73d5a4820c34" />
+### צילום הרצת השאילתה
+
+כאן ניתן לראות את הרצת שאילתת ה־UPDATE והודעת המערכת שמציינת כמה רשומות עודכנו.
+
+<img width="2869" height="1459" alt="image" src="https://github.com/user-attachments/assets/2efdf5b2-5fd4-456b-af3e-3e1044a86b4d" />
+### צילום בסיס הנתונים אחרי העדכון
+
+לאחר הרצת השאילתה ניתן לראות שהשדה `status` של השולחנות בעלי ההזמנות העתידיות עודכן לערך `reserved`.
+<img width="2872" height="1471" alt="image" src="https://github.com/user-attachments/assets/290186ae-1da1-49aa-8bcb-4dd97c44de98" />
 
 ### Update 3 – חישוב מחדש של מחיר הזמנה
 
@@ -549,6 +576,22 @@ FROM (
 ) AS order_totals
 WHERE Orders.order_id = order_totals.order_id;
 ```
+### צילום בסיס הנתונים לפני העדכון
+
+כאן ניתן לראות את מחירי ההזמנות לפני חישוב מחדש של המחיר הכולל.
+
+<img width="2844" height="1459" alt="image" src="https://github.com/user-attachments/assets/a6e163b9-7749-44fb-abd9-054b42483e2c" />
+### צילום הרצת השאילתה
+
+כאן ניתן לראות את הרצת שאילתת ה־UPDATE.  
+המערכת החזירה `UPDATE 0`, כלומר לא נמצאו רשומות שדורשות שינוי, מכיוון שהמחירים בטבלת `Orders` כבר היו מעודכנים ונכונים בהתאם לנתוני ההזמנות.
+
+<img width="2877" height="1473" alt="image" src="https://github.com/user-attachments/assets/82aa9b4e-7e06-4259-8be2-7a413b22b863" />
+### צילום בסיס הנתונים אחרי העדכון
+
+לאחר הרצת השאילתה ניתן לראות שלא חל שינוי בנתונים, משום שמחירי ההזמנות כבר תאמו לחישוב שבוצע מתוך טבלאות `OrderItem` ו־`MenuItem`.
+
+<img width="2873" height="1451" alt="image" src="https://github.com/user-attachments/assets/daf906fa-9a4b-49a7-8b94-eae9318cd2a7" />
 
 ---
 
@@ -563,6 +606,23 @@ DELETE FROM Orders
 WHERE status = 'cancelled';
 ```
 
+### צילום בסיס הנתונים לפני המחיקה
+
+כאן ניתן לראות הזמנות בעלות סטטוס `cancelled` לפני ביצוע המחיקה.
+<img width="2874" height="1450" alt="image" src="https://github.com/user-attachments/assets/aed1315d-5603-44da-b241-a55b95155f06" />
+### צילום הרצת השאילתה
+
+כאן ניתן לראות את הרצת שאילתת ה־DELETE.  
+המערכת החזירה `DELETE 4983`, כלומר נמחקו 4983 הזמנות שבוטלו.
+
+<img width="2864" height="1470" alt="image" src="https://github.com/user-attachments/assets/a8e0c3d8-8d7c-4e57-8ec3-e152c4bf8e09" />
+### צילום בסיס הנתונים אחרי המחיקה
+
+לאחר הרצת השאילתה ניתן לראות שלא קיימות יותר הזמנות בעלות סטטוס `cancelled` בטבלת `Orders`.
+
+<img width="2877" height="1453" alt="image" src="https://github.com/user-attachments/assets/fb042005-427f-4552-9cbe-cc4a069ce7f1" />
+
+
 ### Delete 2 – מחיקת הזמנות ישנות
 
 מטרת השאילתה היא למחוק הזמנות משנים קודמות לפי שדה התאריך.
@@ -571,6 +631,21 @@ WHERE status = 'cancelled';
 DELETE FROM Reservation
 WHERE EXTRACT(YEAR FROM date) < EXTRACT(YEAR FROM CURRENT_DATE);
 ```
+### צילום בסיס הנתונים לפני המחיקה
+
+כאן ניתן לראות רשומת הזמנה ישנה משנת 2024 לפני ביצוע המחיקה.
+
+<img width="2874" height="1470" alt="image" src="https://github.com/user-attachments/assets/a43ab9b0-7fe2-4415-a06f-cc917a825d8a" />
+### צילום הרצת השאילתה
+
+כאן ניתן לראות את הרצת שאילתת ה־DELETE והודעת המערכת שמציינת כמה רשומות נמחקו.
+
+<img width="2864" height="1459" alt="image" src="https://github.com/user-attachments/assets/6cd2b4aa-db8d-4bb2-aeda-712926977f9e" />
+### צילום בסיס הנתונים אחרי המחיקה
+
+לאחר הרצת השאילתה ניתן לראות שההזמנות הישנות נמחקו מטבלת `Reservation`, ולא קיימות יותר רשומות משנים קודמות.
+<img width="2855" height="1465" alt="image" src="https://github.com/user-attachments/assets/8dd7fb29-295d-48eb-9573-d73eccece9b4" />
+
 
 ### Delete 3 – מחיקת מנות לא זמינות
 
@@ -580,3 +655,16 @@ WHERE EXTRACT(YEAR FROM date) < EXTRACT(YEAR FROM CURRENT_DATE);
 DELETE FROM MenuItem
 WHERE availability = false;
 ```
+### צילום בסיס הנתונים לפני המחיקה
+
+כאן ניתן לראות מנות שסומנו כלא זמינות ואינן מופיעות בהזמנות לפני ביצוע המחיקה.
+<img width="1" height="1702" alt="image" src="https://github.com/user-attachments/assets/565d16c2-bfdd-484c-81c9-61e20cfcc356" />
+### צילום הרצת השאילתה
+
+כאן ניתן לראות את הרצת שאילתת ה־DELETE ואת הודעת המערכת המציינת כמה רשומות נמחקו.
+
+<img width="2866" height="1460" alt="image" src="https://github.com/user-attachments/assets/47e1ceae-1412-4d8c-acf1-a3919de968fb" />
+### צילום בסיס הנתונים אחרי המחיקה
+
+לאחר הרצת השאילתה ניתן לראות שהמנות שסומנו כלא זמינות ואינן מקושרות להזמנות הוסרו מטבלת `MenuItem`.
+<img width="2875" height="1451" alt="image" src="https://github.com/user-attachments/assets/6f34b579-21da-4f89-b81b-a3a8bd8771e9" />
