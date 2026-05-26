@@ -299,6 +299,7 @@ ON c.customer_id = r.customer_id
 GROUP BY c.customer_id, c.name, c.phone
 ORDER BY total_reservations DESC;
 ```
+<img width="2867" height="1449" alt="image" src="https://github.com/user-attachments/assets/71ed59a4-f139-4a41-aa54-0dd96d8f9df9" />
 
 ### Query 1B – Using Subquery
 
@@ -321,6 +322,7 @@ JOIN (
 ON c.customer_id = reservation_data.customer_id
 ORDER BY reservation_data.total_reservations DESC;
 ```
+<img width="2869" height="1455" alt="image" src="https://github.com/user-attachments/assets/02036e39-d902-4a8a-9f48-c79732c8a6db" />
 
 ### Efficiency Explanation
 
@@ -353,6 +355,7 @@ GROUP BY rt.table_id, rt.capacity, rt.status
 HAVING COUNT(r.reservation_id) = 0
 ORDER BY rt.table_id;
 ```
+<img width="2872" height="1459" alt="image" src="https://github.com/user-attachments/assets/0bab2354-a08f-4146-b80c-cfa87492c0e0" />
 
 ### Query 2B – Using NOT EXISTS
 
@@ -370,6 +373,7 @@ WHERE NOT EXISTS (
 )
 ORDER BY rt.table_id;
 ```
+<img width="2869" height="1460" alt="image" src="https://github.com/user-attachments/assets/0e14b12c-903c-40df-a4bf-00da6dc274ae" />
 
 ### Efficiency Explanation
 
@@ -402,6 +406,7 @@ GROUP BY
     EXTRACT(MONTH FROM r.date)
 ORDER BY reservation_year, reservation_month;
 ```
+<img width="2864" height="1468" alt="image" src="https://github.com/user-attachments/assets/c972696d-c186-42a8-adb1-64a8f0665e87" />
 
 ### Query 3B – Using Subquery
 
@@ -427,6 +432,7 @@ ORDER BY
     reservation_data.reservation_year,
     reservation_data.reservation_month;
 ```
+<img width="2877" height="1464" alt="image" src="https://github.com/user-attachments/assets/2ae6ced8-930c-4ed0-bf73-70f6d87ab8d5" />
 
 ### Efficiency Explanation
 
@@ -459,6 +465,7 @@ ON mi.item_id = oi.item_id
 GROUP BY mi.category
 ORDER BY total_revenue DESC;
 ```
+<img width="2878" height="1468" alt="image" src="https://github.com/user-attachments/assets/098d93e0-da7d-4df7-86a7-961394bd9e25" />
 
 ### Query 4B – Using Subquery
 
@@ -483,6 +490,7 @@ FROM (
 GROUP BY category_data.category
 ORDER BY total_revenue DESC;
 ```
+<img width="2869" height="1458" alt="image" src="https://github.com/user-attachments/assets/fffe07b0-17f1-4b2f-9e51-81866400fd00" />
 
 ### Efficiency Explanation
 
