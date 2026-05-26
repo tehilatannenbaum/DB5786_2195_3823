@@ -246,6 +246,7 @@ Constraints are used to ensure data integrity and prevent invalid data entry.
 ### createTables.sql
 
 
+
 ### dropTables.sql
 
 This file contains DROP TABLE commands for deleting all database tables in an order that respects the foreign key dependencies between them.  
@@ -266,6 +267,7 @@ To verify the backup, we restored it into a new database named "restaurant_backu
 Get-Content backup_01_05_26.sql | docker exec -i db_postgres psql -U admin -d restaurant_backup
 
 We confirmed that the restore was successful by checking that all tables and data were correctly loaded.
+
 
 ### STAGE 2:
 
