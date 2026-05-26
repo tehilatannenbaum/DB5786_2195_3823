@@ -88,8 +88,8 @@ ORDER BY rt.table_id;
 
 
 -- =========================================
--- QUERY 3
--- Monthly reservation statistics using dates
+-- QUERY 3A
+-- Monthly reservation statistics using GROUP BY
 -- =========================================
 
 SELECT
@@ -107,8 +107,36 @@ ORDER BY reservation_year, reservation_month;
 
 
 -- =========================================
--- QUERY 4
--- Revenue by menu category
+-- QUERY 3B
+-- Same query using subquery
+-- =========================================
+
+SELECT
+    reservation_data.reservation_year,
+    reservation_data.reservation_month,
+    COUNT(*) AS total_reservations,
+    SUM(reservation_data.number_of_guests) AS total_guests,
+    AVG(reservation_data.number_of_guests) AS average_guests
+FROM (
+    SELECT
+        reservation_id,
+        number_of_guests,
+        EXTRACT(YEAR FROM date) AS reservation_year,
+        EXTRACT(MONTH FROM date) AS reservation_month
+    FROM Reservation
+) AS reservation_data
+GROUP BY
+    reservation_data.reservation_year,
+    reservation_data.reservation_month
+ORDER BY
+    reservation_data.reservation_year,
+    reservation_data.reservation_month;
+
+
+
+-- =========================================
+-- QUERY 4A
+-- Revenue by menu category using JOIN
 -- =========================================
 
 SELECT
@@ -124,6 +152,31 @@ GROUP BY mi.category
 ORDER BY total_revenue DESC;
 
 
+
+-- =========================================
+-- QUERY 4B
+-- Revenue by menu category using subquery
+-- =========================================
+
+SELECT
+    category_data.category,
+    COUNT(DISTINCT category_data.item_id) AS number_of_items,
+    SUM(category_data.quantity) AS total_items_sold,
+    SUM(category_data.item_total) AS total_revenue,
+    AVG(category_data.price) AS average_price
+FROM (
+    SELECT
+        mi.item_id,
+        mi.category,
+        mi.price,
+        oi.quantity,
+        (oi.quantity * mi.price) AS item_total
+    FROM MenuItem mi
+    JOIN OrderItem oi
+    ON mi.item_id = oi.item_id
+) AS category_data
+GROUP BY category_data.category
+ORDER BY total_revenue DESC;
 
 -- =========================================
 -- UPDATE 1
